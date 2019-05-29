@@ -24,21 +24,42 @@ module.exports = {
 	            let video = await yt.getVideoByID(videos[0].id);
 	            return video;
 	        } catch (e) {
-	            console.error(e);
-	            throw new Error("Unable to find video.");
+							try {
+								let playlist = await yt.getPlaylist(input);
+								return playlist;
+							} catch (e){
+								console.error(e);
+		            throw new Error("Unable to find video.");
+							}
+
 	        }
 	    }
 	},
 	obtainSong: function(video){
 		if (video != null) {
-	        let song = {
-	            title: video.title,
-	            url: `https://www.youtube.com/watch?v=${video.id}`,
-	            duration: video.duration,
-	            thumbnail: video.maxRes.url
-	        };
+					try{
+						let song = {
+		            title: video.title,
+		            url: `https://www.youtube.com/watch?v=${video.id}`,
+		            duration: video.duration,
+		            thumbnail: video.maxRes.url
+		        };
 
-	        return song;
+		        return song;
+					} catch (e){
+						let songs = [];
+						for(let i = 0; i < video.length; i++){
+							let song = {
+								title: video.videos[i].title,
+		            url: `https://www.youtube.com/watch?v=${video.videos[i].id}`,
+		            duration: video.videos[i].duration,
+		            thumbnail: video.videos[i].maxRes.url
+							}
+							songs.push(song);
+						}
+						return songs;
+					}
+
 	    }
 	    return null;
 	},
@@ -60,7 +81,7 @@ module.exports = {
 	        	}
     		})
 		})
-		
+
 
 	},
 	durationToString: function(dur) {
@@ -87,7 +108,7 @@ module.exports = {
             embed.setDescription(`**Queue is currently empty**`);
             embed.setColor("aaaaaa");
         } else {
-        	
+
         	embed.setColor(await module.exports.downloadColor(queue.songs[0].thumbnail, './assets/thumb.jpg'));
             embed.setDescription(`**Currently playing: **${queue.songs[0].title}\n**Duration: **${module.exports.durationToString(queue.songs[0].duration)}`);
             embed.setThumbnail(queue.songs[0].thumbnail);
@@ -107,7 +128,7 @@ module.exports = {
     			.on('finish', () => {
     				color(path, (e, col) => {
 		                resolve(col);
-		                
+
             		});
     			});
     	});

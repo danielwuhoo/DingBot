@@ -23,7 +23,7 @@ exports.run = async (client, message, args) => {
     		throw new Error('Join a voice channel to play music');
     	}
 		connection = await functions.voiceJoin(voiceChannel);
-		song = functions.obtainSong(await functions.obtainVideo(yt, input));	
+		song = functions.obtainSong(await functions.obtainVideo(yt, input));
     } catch (e){
     	functions.updateFile(queueName, (queue) => {
     		functions.updateMenu(msg, new Discord.RichEmbed(), queue, e);
@@ -36,7 +36,14 @@ exports.run = async (client, message, args) => {
     functions.updateFile(queueName, (queue) => {
 	    queue.channel = voiceChannel.name;
         if (song != null) {
+          try{
             queue.songs.push(song);
+          } catch (error){
+            for(let i = 0; i < song.length; i++){
+              queue.songs.push(song[0]);
+            }
+          }
+
         }
         if (!queue.playing) {
             play(queue.songs[0]);
@@ -75,7 +82,7 @@ exports.run = async (client, message, args) => {
     }
 
 
-    
+
 
 
 };

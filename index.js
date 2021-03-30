@@ -52,7 +52,7 @@ const grabData = async () => {
 	const available = data.filter(e => cities.includes(e.city) && e.status != 'Fully Booked');
 
 	if (available.length) {
-		const mainChannel = await client.channels.fetch('141703897659080704');
+		const mainChannel = await client.channels.fetch('782426150931529791');
 		mainChannel.send(`<@&209490258859917313> Vaccines available in ${available.map(e => e.city).join()} \n https://www.cvs.com/immunizations/covid-19-vaccine`);
 	}
 }
@@ -77,7 +77,7 @@ const grabOtherData = async () => {
 
 	const data = await response.json();
 	if (data.responseMetaData.statusCode == '0000') {
-		const mainChannel = await client.channels.fetch('141703897659080704');
+		const mainChannel = await client.channels.fetch('782426150931529791');
 		mainChannel.send(`<@&209490258859917313> Vaccines available in ${data.responsePayloadData.locations.map(e => e.addressLine).join()} \n https://www.cvs.com/immunizations/covid-19-vaccine`);
 	}
 }

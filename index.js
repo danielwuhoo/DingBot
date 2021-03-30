@@ -57,8 +57,34 @@ const grabData = async () => {
 	}
 }
 
-cron.schedule('* * * * *', () => {
+const grabOtherData = async () => {
+	const response = await fetch("https://www.cvs.com/Services/ICEAGPV1/immunization/1.0.0/getIMZStores", {
+		"headers": {
+		  "accept": "application/json",
+		  "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+		  "content-type": "application/json",
+		  "sec-ch-ua-mobile": "?1",
+		  "sec-fetch-dest": "empty",
+		  "sec-fetch-mode": "cors",
+		  "sec-fetch-site": "same-origin",
+		},
+		"referrer": "https://www.cvs.com/vaccine/intake/store/cvd-store-select/first-dose-select",
+		"referrerPolicy": "strict-origin-when-cross-origin",
+		"body": "{\"requestMetaData\":{\"appName\":\"CVS_WEB\",\"lineOfBusiness\":\"RETAIL\",\"channelName\":\"MOBILE\",\"deviceType\":\"AND_MOBILE\",\"deviceToken\":\"7777\",\"apiKey\":\"a2ff75c6-2da7-4299-929d-d670d827ab4a\",\"source\":\"ICE_WEB\",\"securityType\":\"apiKey\",\"responseFormat\":\"JSON\",\"type\":\"cn-dep\"},\"requestPayloadData\":{\"selectedImmunization\":[\"CVD\"],\"distanceInMiles\":35,\"imzData\":[{\"imzType\":\"CVD\",\"ndc\":[\"59267100002\",\"59267100003\",\"59676058015\",\"80777027399\"],\"allocationType\":\"1\"}],\"searchCriteria\":{\"addressLine\":\"22032\"}}}",
+		"method": "POST",
+		"mode": "cors"
+	  });
+
+	const data = await response.json();
+	if (data.responseMetaData.statusCode == '0000') {
+		const mainChannel = await client.channels.fetch('141703897659080704');
+		mainChannel.send(`<@&209490258859917313> Vaccines available in ${data.responsePayloadData.locations.map(e => e.addressLine).join()} \n https://www.cvs.com/immunizations/covid-19-vaccine`);
+	}
+}
+
+cron.schedule('*/5 * * * *', () => {
 	grabData();
+	grabOtherData();
 });
 
 fs.readdir("./commands/", (err, files) => {
